@@ -4,6 +4,11 @@
   sku: string;
   quantity: number;
   price: number;
+  cost?: number;
+  minQuantity?: number;
+  unit?: string;
+  categoryId?: string;
+  supplierId?: string;
 }
 
 export interface InventoryItemInput {
@@ -11,4 +16,9 @@ export interface InventoryItemInput {
   sku: string;
   quantity: number;
   price: number;
+  cost: number;
+  minQuantity: number;
+  unit: string;
+  categoryId: string;
+  supplierId: string;
 }

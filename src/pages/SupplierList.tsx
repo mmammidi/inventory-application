@@ -1,11 +1,11 @@
-﻿import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Button, Flex, Input, Popconfirm, Table, Typography, message } from 'antd';
 import { Link, useNavigate } from 'react-router-dom';
-import { deleteItem, listItems } from '../api/inventory';
-import type { InventoryItem } from '../types/inventory';
+import { deleteSupplier, listSuppliers } from '../api/suppliers';
+import type { Supplier } from '../types/supplier';
 
-export default function InventoryList() {
-  const [items, setItems] = useState<InventoryItem[]>([]);
+export default function SupplierList() {
+  const [items, setItems] = useState<Supplier[]>([]);
   const [loading, setLoading] = useState(false);
   const [query, setQuery] = useState('');
   const navigate = useNavigate();
@@ -13,13 +13,10 @@ export default function InventoryList() {
   const fetchItems = async () => {
     try {
       setLoading(true);
-      const data = await listItems();
+      const data = await listSuppliers();
       setItems(data);
-      // Debug: log fetched count and first item shape
-      // eslint-disable-next-line no-console
-      console.log('Fetched items:', Array.isArray(data) ? data.length : 0, data?.[0]);
     } catch (err) {
-      message.error('Failed to load items');
+      message.error('Failed to load suppliers');
     } finally {
       setLoading(false);
     }
@@ -34,39 +31,43 @@ export default function InventoryList() {
     if (!q) return items;
     return items.filter(i =>
       i.name.toLowerCase().includes(q) ||
-      i.sku.toLowerCase().includes(q)
+      (i.contactName?.toLowerCase().includes(q) ?? false) ||
+      (i.email?.toLowerCase().includes(q) ?? false) ||
+      (i.phone?.toLowerCase().includes(q) ?? false) ||
+      (i.address?.toLowerCase().includes(q) ?? false)
     );
   }, [items, query]);
 
   return (
     <div>
-      <Typography.Title level={3} style={{ marginTop: 0 }}>Items List</Typography.Title>
+      <Typography.Title level={3} style={{ marginTop: 0 }}>Suppliers List</Typography.Title>
       <Flex justify="space-between" align="center" style={{ marginBottom: 16 }}>
-        <Input.Search placeholder="Search by name or SKU" value={query} onChange={(e) => setQuery(e.target.value)} onSearch={setQuery} allowClear style={{ maxWidth: 360 }} />
+        <Input.Search placeholder="Search by name" value={query} onChange={(e) => setQuery(e.target.value)} onSearch={setQuery} allowClear style={{ maxWidth: 360 }} />
         <Flex gap="small">
           <Button onClick={fetchItems} loading={loading}>Refresh</Button>
-          <Button type="primary" onClick={() => navigate('/items/new')}>New Item</Button>
+          <Button type="primary" onClick={() => navigate('/suppliers/new')}>New Supplier</Button>
         </Flex>
       </Flex>
       <Table
-        rowKey={(record: InventoryItem) => record.id || record.sku}
+        rowKey={(record: Supplier) => record.id}
         loading={loading}
         dataSource={filtered}
         pagination={{ pageSize: 10 }}
-        locale={{ emptyText: 'No items found' }}
+        locale={{ emptyText: 'No suppliers found' }}
         columns={[
           { title: 'Name', dataIndex: 'name' },
-          { title: 'SKU', dataIndex: 'sku' },
-          { title: 'Quantity', dataIndex: 'quantity' },
-          { title: 'Price', dataIndex: 'price', render: (v: number) => `$${v.toFixed(2)}` },
+          { title: 'ContactName', dataIndex: 'contactName' },
+          { title: 'Email', dataIndex: 'email' },
+          { title: 'Phone', dataIndex: 'phone' },
+          { title: 'Address', dataIndex: 'address' },
           {
             title: 'Actions',
-            render: (_: any, record: InventoryItem) => (
+            render: (_: any, record: Supplier) => (
               <Flex gap="small">
-                <Link to={`/items/${record.id}/edit`}>Edit</Link>
-                <Popconfirm title="Delete item?" onConfirm={async () => {
+                <Link to={`/suppliers/${record.id}/edit`}>Edit</Link>
+                <Popconfirm title="Delete supplier?" onConfirm={async () => {
                   try {
-                    await deleteItem(record.id);
+                    await deleteSupplier(record.id);
                     setItems(prev => prev.filter(i => i.id !== record.id));
                     message.success('Deleted');
                   } catch {
@@ -83,3 +84,5 @@ export default function InventoryList() {
     </div>
   );
 }
+
+
