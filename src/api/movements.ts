@@ -6,10 +6,10 @@ const movementsPath = import.meta.env.VITE_API_MOVEMENTS_PATH || '/api/v1/moveme
 function normalizeMovement(raw: any): Movement {
   return {
     id: String(raw.id ?? raw._id ?? ''),
-    movementType: String(raw.movementType ?? raw.movement_type ?? raw.type ?? ''),
+    movementType: String(raw.type ?? raw.movementType ?? raw.movement_type ?? ''),
     quantity: Number(raw.quantity ?? 0),
-    reasonText: raw.reasonText ?? raw.reason_text ?? raw.reason ?? undefined,
-    referenceText: raw.referenceText ?? raw.reference_text ?? raw.reference ?? undefined,
+    reasonText: raw.reason ?? raw.reasonText ?? raw.reason_text ?? undefined,
+    referenceText: raw.reference ?? raw.referenceText ?? raw.reference_text ?? undefined,
     notes: raw.notes ?? undefined,
     itemId: raw.itemId ?? raw.item_id ?? (raw.item?.id ? String(raw.item.id) : undefined),
     userId: raw.userId ?? raw.user_id ?? (raw.user?.id ? String(raw.user.id) : undefined),
@@ -20,7 +20,7 @@ function normalizeMovement(raw: any): Movement {
     } : undefined,
     user: raw.user ? {
       id: String(raw.user.id ?? ''),
-      name: String(raw.user.name ?? raw.user.username ?? '')
+      name: String(`${raw.user.firstName || ''} ${raw.user.lastName || ''}`.trim() || raw.user.username || '')
     } : undefined
   };
 }
@@ -33,6 +33,9 @@ function pickArray<T = unknown>(payload: any): T[] {
   if (Array.isArray(payload?.data?.movements)) return payload.data.movements as T[];
   if (Array.isArray(payload?.data?.items)) return payload.data.items as T[];
   if (Array.isArray(payload?.data?.results)) return payload.data.results as T[];
+  if (Array.isArray(payload?.data?.users)) return payload.data.users as T[];
+  if (Array.isArray(payload?.data?.categories)) return payload.data.categories as T[];
+  if (Array.isArray(payload?.data?.suppliers)) return payload.data.suppliers as T[];
   return [] as T[];
 }
 

@@ -27,6 +27,10 @@ function pickArray<T = unknown>(payload: any): T[] {
   // Nested under data
   if (Array.isArray(payload?.data?.items)) return payload.data.items as T[];
   if (Array.isArray(payload?.data?.results)) return payload.data.results as T[];
+  if (Array.isArray(payload?.data?.users)) return payload.data.users as T[];
+  if (Array.isArray(payload?.data?.categories)) return payload.data.categories as T[];
+  if (Array.isArray(payload?.data?.suppliers)) return payload.data.suppliers as T[];
+  if (Array.isArray(payload?.data?.movements)) return payload.data.movements as T[];
   return [] as T[];
 }
 
