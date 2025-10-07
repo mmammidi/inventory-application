@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
-import { Alert, Button, Card, Form, Input, InputNumber, Select, message, Space } from 'antd';
-import { ArrowLeftOutlined } from '@ant-design/icons';
+import { Alert, Button, Card, Form, Input, InputNumber, Select, message, Space, Typography, Divider, Row, Col } from 'antd';
+import { ArrowLeftOutlined, SaveOutlined, SwapOutlined } from '@ant-design/icons';
 import type { AxiosError } from 'axios';
 import { useNavigate, useParams } from 'react-router-dom';
 import { createMovement, getMovement, updateMovement } from '../api/movements';

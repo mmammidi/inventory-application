@@ -1,6 +1,6 @@
 ﻿import { useEffect, useState } from 'react';
-import { Alert, Button, Card, Form, Input, InputNumber, Select, message, Space } from 'antd';
-import { ArrowLeftOutlined } from '@ant-design/icons';
+import { Alert, Button, Card, Form, Input, InputNumber, Select, message, Space, Typography, Divider, Row, Col } from 'antd';
+import { ArrowLeftOutlined, SaveOutlined, ShoppingCartOutlined } from '@ant-design/icons';
 import type { AxiosError } from 'axios';
 import { useNavigate, useParams } from 'react-router-dom';
 import { createItem, getItem, updateItem } from '../api/inventory';
@@ -129,57 +129,217 @@ export default function InventoryForm() {
   };
 
   return (
-    <Card title={isEdit ? 'Edit Item' : 'New Item'}>
-      {submitError && (
-        <Alert type="error" showIcon message={submitError} style={{ marginBottom: 16 }} />
-      )}
-      <Form form={form} layout="vertical" onFinish={onFinish}>
-        <Form.Item label="Name" name="name" rules={[{ required: true }]}>
-          <Input />
-        </Form.Item>
-        <Form.Item label="SKU" name="sku" rules={[{ required: true }]}>
-          <Input />
-        </Form.Item>
-        <Form.Item label="Quantity" name="quantity" rules={[{ required: true, type: 'number', min: 0 }]}>
-          <InputNumber style={{ width: '100%' }} />
-        </Form.Item>
-        <Form.Item label="Price" name="price" rules={[{ required: true, type: 'number', min: 0 }]}>
-          <InputNumber style={{ width: '100%' }} prefix="$" step={0.01} />
-        </Form.Item>
-        <Form.Item label="Cost" name="cost" rules={[{ required: true, type: 'number', min: 0 }]}>
-          <InputNumber style={{ width: '100%' }} prefix="$" step={0.01} />
-        </Form.Item>
-        <Form.Item label="Min Quantity" name="minQuantity" rules={[{ required: true, type: 'number', min: 0 }]}>
-          <InputNumber style={{ width: '100%' }} />
-        </Form.Item>
-        <Form.Item label="Unit" name="unit" rules={[{ required: true }]}>
-          <Input />
-        </Form.Item>
-        <Form.Item label="Category" name="categoryId" rules={[{ required: true }]}> 
-          <Select
-            placeholder="Select a category"
-            options={categories.map(c => ({ label: c.name, value: c.id }))}
-            showSearch
-            optionFilterProp="label"
+    <div>
+      {/* Header */}
+      <div style={{ marginBottom: '32px' }}>
+        <Typography.Title level={2} style={{ margin: 0, color: 'var(--text-primary)' }}>
+          <ShoppingCartOutlined style={{ marginRight: '12px', color: 'var(--primary-color)' }} />
+          {isEdit ? 'Edit Item' : 'Create New Item'}
+        </Typography.Title>
+        <Typography.Text type="secondary" style={{ fontSize: '1rem' }}>
+          {isEdit ? 'Update item information and inventory details' : 'Add a new item to your inventory'}
+        </Typography.Text>
+      </div>
+
+      <Card 
+        style={{ 
+          borderRadius: 'var(--radius-lg)', 
+          border: '1px solid var(--border-color)',
+          boxShadow: 'var(--shadow-sm)'
+        }}
+      >
+        {submitError && (
+          <Alert 
+            type="error" 
+            showIcon 
+            message={submitError} 
+            style={{ 
+              marginBottom: 24,
+              borderRadius: 'var(--radius-md)'
+            }} 
           />
-        </Form.Item>
-        <Form.Item label="Supplier" name="supplierId" rules={[{ required: true }]}> 
-          <Select
-            placeholder="Select a supplier"
-            options={suppliers.map(s => ({ label: s.name, value: s.id }))}
-            showSearch
-            optionFilterProp="label"
-          />
-        </Form.Item>
-        <Form.Item>
-          <Space>
-            <Button type="primary" htmlType="submit" loading={loading}>Save</Button>
-            <Button icon={<ArrowLeftOutlined />} onClick={() => navigate('/items')}>
-              Return to Items List
-            </Button>
-          </Space>
-        </Form.Item>
-      </Form>
-    </Card>
+        )}
+        
+        <Form 
+          form={form} 
+          layout="vertical" 
+          onFinish={onFinish}
+          size="large"
+          style={{ maxWidth: 800 }}
+        >
+          <Row gutter={[24, 0]}>
+            <Col xs={24} md={12}>
+              <Form.Item 
+                label={<span style={{ fontWeight: 500 }}>Item Name</span>} 
+                name="name" 
+                rules={[{ required: true, message: 'Please enter item name' }]}
+              >
+                <Input 
+                  placeholder="Enter item name"
+                  style={{ borderRadius: 'var(--radius-md)' }}
+                />
+              </Form.Item>
+            </Col>
+            <Col xs={24} md={12}>
+              <Form.Item 
+                label={<span style={{ fontWeight: 500 }}>SKU</span>} 
+                name="sku" 
+                rules={[{ required: true, message: 'Please enter SKU' }]}
+              >
+                <Input 
+                  placeholder="Enter SKU"
+                  style={{ borderRadius: 'var(--radius-md)' }}
+                />
+              </Form.Item>
+            </Col>
+          </Row>
+
+          <Row gutter={[24, 0]}>
+            <Col xs={24} md={8}>
+              <Form.Item 
+                label={<span style={{ fontWeight: 500 }}>Current Quantity</span>} 
+                name="quantity" 
+                rules={[{ required: true, type: 'number', min: 0, message: 'Please enter valid quantity' }]}
+              >
+                <InputNumber 
+                  style={{ width: '100%' }} 
+                  placeholder="0"
+                  min={0}
+                />
+              </Form.Item>
+            </Col>
+            <Col xs={24} md={8}>
+              <Form.Item 
+                label={<span style={{ fontWeight: 500 }}>Selling Price</span>} 
+                name="price" 
+                rules={[{ required: true, type: 'number', min: 0, message: 'Please enter valid price' }]}
+              >
+                <InputNumber 
+                  style={{ width: '100%' }} 
+                  prefix="$" 
+                  step={0.01}
+                  placeholder="0.00"
+                  min={0}
+                />
+              </Form.Item>
+            </Col>
+            <Col xs={24} md={8}>
+              <Form.Item 
+                label={<span style={{ fontWeight: 500 }}>Cost Price</span>} 
+                name="cost" 
+                rules={[{ required: true, type: 'number', min: 0, message: 'Please enter valid cost' }]}
+              >
+                <InputNumber 
+                  style={{ width: '100%' }} 
+                  prefix="$" 
+                  step={0.01}
+                  placeholder="0.00"
+                  min={0}
+                />
+              </Form.Item>
+            </Col>
+          </Row>
+
+          <Row gutter={[24, 0]}>
+            <Col xs={24} md={8}>
+              <Form.Item 
+                label={<span style={{ fontWeight: 500 }}>Minimum Quantity</span>} 
+                name="minQuantity" 
+                rules={[{ required: true, type: 'number', min: 0, message: 'Please enter minimum quantity' }]}
+              >
+                <InputNumber 
+                  style={{ width: '100%' }} 
+                  placeholder="0"
+                  min={0}
+                />
+              </Form.Item>
+            </Col>
+            <Col xs={24} md={8}>
+              <Form.Item 
+                label={<span style={{ fontWeight: 500 }}>Unit</span>} 
+                name="unit" 
+                rules={[{ required: true, message: 'Please enter unit' }]}
+              >
+                <Input 
+                  placeholder="e.g., pcs, kg, lbs"
+                  style={{ borderRadius: 'var(--radius-md)' }}
+                />
+              </Form.Item>
+            </Col>
+          </Row>
+
+          <Divider style={{ margin: '32px 0' }} />
+
+          <Row gutter={[24, 0]}>
+            <Col xs={24} md={12}>
+              <Form.Item 
+                label={<span style={{ fontWeight: 500 }}>Category</span>} 
+                name="categoryId" 
+                rules={[{ required: true, message: 'Please select a category' }]}
+              > 
+                <Select
+                  placeholder="Select a category"
+                  options={categories.map(c => ({ label: c.name, value: c.id }))}
+                  showSearch
+                  optionFilterProp="label"
+                  style={{ borderRadius: 'var(--radius-md)' }}
+                />
+              </Form.Item>
+            </Col>
+            <Col xs={24} md={12}>
+              <Form.Item 
+                label={<span style={{ fontWeight: 500 }}>Supplier</span>} 
+                name="supplierId" 
+                rules={[{ required: true, message: 'Please select a supplier' }]}
+              > 
+                <Select
+                  placeholder="Select a supplier"
+                  options={suppliers.map(s => ({ label: s.name, value: s.id }))}
+                  showSearch
+                  optionFilterProp="label"
+                  style={{ borderRadius: 'var(--radius-md)' }}
+                />
+              </Form.Item>
+            </Col>
+          </Row>
+
+          <Divider style={{ margin: '32px 0' }} />
+
+          <Form.Item style={{ marginBottom: 0 }}>
+            <Space size="large">
+              <Button 
+                type="primary" 
+                htmlType="submit" 
+                loading={loading}
+                icon={<SaveOutlined />}
+                size="large"
+                style={{
+                  background: 'var(--primary-color)',
+                  borderColor: 'var(--primary-color)',
+                  borderRadius: 'var(--radius-md)',
+                  height: '44px',
+                  padding: '0 32px',
+                  fontWeight: 500
+                }}
+              >
+                {isEdit ? 'Update Item' : 'Create Item'}
+              </Button>
+              <Button 
+                icon={<ArrowLeftOutlined />} 
+                onClick={() => navigate('/items')}
+                size="large"
+                style={{
+                  borderRadius: 'var(--radius-md)',
+                  height: '44px',
+                  padding: '0 24px'
+                }}
+              >
+                Return to Items List
+              </Button>
+            </Space>
+          </Form.Item>
+        </Form>
+      </Card>
+    </div>
   );
 }
